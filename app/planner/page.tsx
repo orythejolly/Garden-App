@@ -50,7 +50,7 @@ export default function PlannerPage() {
       const { data: plantData } = await supabase
         .from("plants")
         .select("*")
-        .in("id", [...matchingPlantIds])
+        .in("id", Array.from(matchingPlantIds))
         .order("name_en");
 
       setPlants(plantData ?? []);
