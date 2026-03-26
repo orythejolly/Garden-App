@@ -230,12 +230,14 @@ function Stat({ label, value }: { label: string; value: string }) {
 function CompanionRow({ companion }: { companion: any }) {
   const plant = companion.companion;
   if (!plant) return null;
+  const relColour = RELATIONSHIP_COLOURS[companion.relationship as keyof typeof RELATIONSHIP_COLOURS] ?? "";
+  const typeEmoji = TYPE_EMOJI[plant.type as keyof typeof TYPE_EMOJI] ?? "🌱";
   return (
     <Link
       href={`/plants/${plant.slug}`}
-      className={`flex items-center gap-3 p-3 rounded-xl border transition-shadow hover:shadow-sm ${RELATIONSHIP_COLOURS[companion.relationship as any]}`}
+      className={`flex items-center gap-3 p-3 rounded-xl border transition-shadow hover:shadow-sm ${relColour}`}
     >
-      <span className="text-2xl">{TYPE_EMOJI[plant.type as any]}</span>
+      <span className="text-2xl">{typeEmoji}</span>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm">{plant.name_en}</p>
         {companion.reason && (
