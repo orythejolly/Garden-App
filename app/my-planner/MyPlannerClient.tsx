@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import type { Plant, CalendarEntry, PlantType } from "@/types";
 import type { CompanionRaw } from "@/lib/supabase";
@@ -66,10 +66,38 @@ interface Props {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
+const STORAGE_KEY = "chichi-garden-plan";
+
 export default function MyPlannerClient({ allPlants, allCalendar, allCompanions }: Props) {
   const [myPlan, setMyPlan] = useState<Plant[]>([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<PlantType | "all">("all");
+
+  // ── Persist plan to localStorage ─────────────────────────────────────────
+  // Load saved plan on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const ids: string[] = JSON.parse(saved);
+        const plantMap = new Map(allPlants.map((p) => [p.id, p]));
+        const restored = ids.map((id) => plantMap.get(id)).filter(Boolean) as Plant[];
+        if (restored.length > 0) setMyPlan(restored);
+      }
+    } catch {
+      // ignore localStorage errors
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save plan whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(myPlan.map((p) => p.id)));
+    } catch {
+      // ignore localStorage errors
+    }
+  }, [myPlan]);
 
   // ── Derived: plant picker ─────────────────────────────────────────────────
   const planIds = useMemo(() => new Set(myPlan.map((p) => p.id)), [myPlan]);
@@ -331,7 +359,10 @@ export default function MyPlannerClient({ allPlants, allCalendar, allCompanions 
 
               {/* Clear plan */}
               <button
-                onClick={() => setMyPlan([])}
+                onClick={() => {
+                  setMyPlan([]);
+                  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+                }}
                 className="text-xs text-gray-400 hover:text-red-500 transition-colors"
               >
                 Clear plan
