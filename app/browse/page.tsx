@@ -1,6 +1,6 @@
 import { getAllPlants } from "@/lib/supabase";
 import { getPlantImageUrl } from "@/lib/wikipedia";
-import PlantGrid from "@/components/PlantGrid";
+import BrowseClient from "./BrowseClient";
 import type { Plant } from "@/types";
 
 export const revalidate = 3600;
@@ -22,7 +22,7 @@ export default async function BrowsePage() {
           {plants.length} plants suited to the Belgian climate — vegetables, fruits, herbs, and flowers.
         </p>
       </div>
-      <PlantGrid plants={enriched} />
+      <BrowseClient plants={enriched} />
     </div>
   );
 }
