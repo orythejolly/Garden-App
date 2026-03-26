@@ -7,6 +7,7 @@ import {
   getCompanionsForPlant,
   getAllPlants,
 } from "@/lib/supabase";
+import { fetchWikipediaImage } from "@/lib/wikipedia";
 import {
   MONTHS,
   ACTIVITY_LABELS,
@@ -36,6 +37,10 @@ export default async function PlantPage({ params }: { params: { slug: string } }
 
   if (!plant) notFound();
 
+  // Enrich with Wikipedia image if no stored image
+  const imageUrl = plant.image_url
+    ?? await fetchWikipediaImage(plant.name_latin, plant.name_en);
+
   const beneficial = companions.filter((c) => c.relationship === "beneficial");
   const harmful    = companions.filter((c) => c.relationship === "harmful");
 
@@ -49,9 +54,9 @@ export default async function PlantPage({ params }: { params: { slug: string } }
       {/* Header */}
       <div className="card mb-6 overflow-hidden">
         <div className="relative h-64 bg-garden-light/30">
-          {plant.image_url ? (
+          {imageUrl ? (
             <Image
-              src={plant.image_url}
+              src={imageUrl}
               alt={plant.name_en}
               fill
               className="object-cover"

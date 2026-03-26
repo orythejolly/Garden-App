@@ -75,9 +75,9 @@ export default function PlannerPage() {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-garden-green mb-2">📅 Monthly Planner</h1>
+        <h1 className="text-3xl font-bold text-garden-green mb-2">📅 Monthly View</h1>
         <p className="text-gray-500">
-          Choose a month to see what you can plant, then click the plants you want to add to your plan.
+          Choose a month to see what you can plant, sow, and harvest right now in Belgium.
         </p>
       </div>
 

@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Plant, CalendarEntry, Companion } from "@/types";
+import type { Plant, CalendarEntry, Companion, Relationship } from "@/types";
 
 const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -73,7 +73,7 @@ export async function getPlantsByMonth(month: number): Promise<Plant[]> {
   const { data: plants, error: pErr } = await supabase
     .from("plants")
     .select("*")
-    .in("id", [...matchingIds])
+    .in("id", Array.from(matchingIds))
     .order("name_en");
   if (pErr) throw pErr;
   return plants ?? [];
@@ -92,6 +92,31 @@ function monthInRange(month: number, start: number, end: number): boolean {
   if (start <= end) return month >= start && month <= end;
   // Wraps over year boundary (e.g. Oct=10 → Mar=3)
   return month >= start || month <= end;
+}
+
+// ── Full table fetches (for My Planner) ───────────────────────
+
+export async function getAllCalendarEntries(): Promise<CalendarEntry[]> {
+  const { data, error } = await supabase
+    .from("planting_calendar")
+    .select("*");
+  if (error) return [];
+  return data ?? [];
+}
+
+export interface CompanionRaw {
+  id: string;
+  plant_id: string;
+  companion_id: string;
+  relationship: Relationship;
+  reason: string | null;
+}
+
+export async function getAllCompanionsRaw(): Promise<CompanionRaw[]> {
+  const { data } = await supabase
+    .from("companions")
+    .select("id, plant_id, companion_id, relationship, reason");
+  return data ?? [];
 }
 
 // ── Companions ────────────────────────────────────────────────
