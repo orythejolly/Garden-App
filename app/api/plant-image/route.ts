@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
         status: 200,
         headers: {
           "Content-Type": contentType,
-          "Cache-Control": "public, max-age=86400, stale-while-revalidate=3600",
+          "Cache-Control": "private, max-age=86400",
         },
       });
     } catch {
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     status: 200,
     headers: {
       "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "private, max-age=3600",
     },
   });
 }
