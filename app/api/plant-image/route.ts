@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-
-// Cache image responses for 24 hours at the CDN level
-export const revalidate = 86400;
+// force-dynamic ensures each unique URL (?latin=...&name=...) is handled
+// independently — without this, Next.js can cache the first response and
+// return it for every subsequent request regardless of query params.
+export const dynamic = "force-dynamic";
 
 /**
  * Proxy route that fetches a plant image from Wikipedia server-side and
