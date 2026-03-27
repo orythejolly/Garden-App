@@ -1,5 +1,5 @@
 import { getAllPlants } from "@/lib/supabase";
-import { fetchWikipediaImage } from "@/lib/wikipedia";
+import { getPlantImageUrl } from "@/lib/wikipedia";
 import PlantGrid from "@/components/PlantGrid";
 import type { Plant } from "@/types";
 
@@ -8,14 +8,11 @@ export const revalidate = 3600;
 export default async function BrowsePage() {
   const plants = await getAllPlants();
 
-  // Enrich plants with Wikipedia images where no image_url is set
-  const enriched: Plant[] = await Promise.all(
-    plants.map(async (plant) => {
-      if (plant.image_url) return plant;
-      const wikiImage = await fetchWikipediaImage(plant.name_latin, plant.name_en);
-      return wikiImage ? { ...plant, image_url: wikiImage } : plant;
-    })
-  );
+  // Give every plant a proxy image URL (served through our API, never direct Wikimedia)
+  const enriched: Plant[] = plants.map((plant) => ({
+    ...plant,
+    image_url: getPlantImageUrl(plant.name_latin, plant.name_en),
+  }));
 
   return (
     <div>

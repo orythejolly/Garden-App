@@ -7,7 +7,7 @@ import {
   getCompanionsForPlant,
   getAllPlants,
 } from "@/lib/supabase";
-import { fetchWikipediaImage } from "@/lib/wikipedia";
+import { getPlantImageUrl } from "@/lib/wikipedia";
 import {
   MONTHS,
   ACTIVITY_LABELS,
@@ -37,9 +37,8 @@ export default async function PlantPage({ params }: { params: { slug: string } }
 
   if (!plant) notFound();
 
-  // Enrich with Wikipedia image if no stored image
-  const imageUrl = plant.image_url
-    ?? await fetchWikipediaImage(plant.name_latin, plant.name_en);
+  // Always use the proxy URL so images load through our server (Wikimedia blocks browsers)
+  const imageUrl = getPlantImageUrl(plant.name_latin, plant.name_en);
 
   const beneficial = companions.filter((c) => c.relationship === "beneficial");
   const harmful    = companions.filter((c) => c.relationship === "harmful");

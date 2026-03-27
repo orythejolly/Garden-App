@@ -1,5 +1,5 @@
 import { getAllPlants, getAllCalendarEntries } from "@/lib/supabase";
-import { fetchWikipediaImage } from "@/lib/wikipedia";
+import { getPlantImageUrl } from "@/lib/wikipedia";
 import PlannerClient from "./PlannerClient";
 import type { Plant } from "@/types";
 
@@ -11,14 +11,11 @@ export default async function PlannerPage() {
     getAllCalendarEntries(),
   ]);
 
-  // Enrich with Wikipedia images where no stored image exists
-  const enriched: Plant[] = await Promise.all(
-    plants.map(async (plant) => {
-      if (plant.image_url) return plant;
-      const wikiImage = await fetchWikipediaImage(plant.name_latin, plant.name_en);
-      return wikiImage ? { ...plant, image_url: wikiImage } : plant;
-    })
-  );
+  // Give every plant a proxy image URL
+  const enriched: Plant[] = plants.map((plant) => ({
+    ...plant,
+    image_url: getPlantImageUrl(plant.name_latin, plant.name_en),
+  }));
 
   return <PlannerClient allPlants={enriched} allCalendar={calendar} />;
 }
